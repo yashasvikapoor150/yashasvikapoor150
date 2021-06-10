@@ -4,16 +4,16 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- master
+pool: ToscaServer
+- task: CmdLine@2
+  displayName: 'Run Tosca CI'
+  inputs: 
+    script: '$(Agent.HomeDirectory)\\work\\client\\ToscaCIClient.exe -m distributed -t junit -r $(Common.TestResultDirectory)\\ToscaCI.xml'
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultFile: '**/ToscaCI*.xml'
+    searchFolder: '$(Common.TestResultsDirectory)'
+    failTaskOnFailedTests: true
+    testRunTitle: 'Publish ToscaCI Test Results'
